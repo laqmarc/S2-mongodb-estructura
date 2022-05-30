@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="optica" id="Project-1e27" database="MongoDb" >
+	<comment><![CDATA[Òptica cul d'ampolla
+Una òptica, anomenada “Cul d'Ampolla”, vol informatitzar la gestió dels clients i vendes d'ulleres.
+
+En primer lloc l'òptica vol saber quin és el proveïdor de cadascuna de les ulleres.  En concret vol saber de cada proveïdor el nom, l'adreça (carrer, número, pis, porta, ciutat, codi postal i país), telèfon, fax, NIF.   
+La política de compres de l'òptica es basa en que les ulleres d'una marca es compraran a un únic proveïdor (així en podrà treure més bons preus), però poden comprar ulleres de diverses marques a un proveïdor. De les ulleres vol saber, la marca, la graduació de cadascun dels vidres, el tipus de muntura (flotant, pasta o metàl·lica), el color de la muntura, el color de cada vidre i el preu.  
+Dels clients vol emmagatzemar el nom, l'adreça postal, el telèfon, el correu electrònic i la data de registre. També ens demanen, quan arriba un client nou, d'emmagatzemar el client que li ha recomanat l'establiment (sempre i quan algú li hagi recomanat).   El nostre sistema haurà d’indicar qui ha sigut l’empleat que ha venut cada ullera.]]></comment>
+	<schema name="optica" >
+		<table name="customers" prior="Clients" >
+			<column name="id" type="int" jt="4" />
+			<column name="name" prior="nom" type="string" jt="12" mandatory="y" />
+			<column name="address" type="string" jt="12" />
+			<column name="phone" type="int" jt="4" >
+				<type_options><![CDATA[minimum: 9 maximum: 9]]></type_options>
+			</column>
+			<column name="email" type="string" jt="12" mandatory="y" />
+			<column name="register_date" type="date" jt="91" mandatory="y" />
+			<column name="id_custom_friend" type="int" jt="4" />
+		</table>
+		<table name="glasses" prior="Collection" >
+			<column name="id" type="int" jt="4" />
+			<column name="brand" type="string" jt="12" />
+			<column name="graduation_glasses" type="array[string]" jt="4999545" >
+				<column name="left" type="double" jt="8" />
+				<column name="right" type="double" jt="8" />
+			</column>
+			<column name="eyeglass_frame_type" type="enum" jt="12" >
+				<enumeration><![CDATA['flotant','pasta','metálica']]></enumeration>
+			</column>
+			<column name="frame_color" type="string" jt="12" />
+			<column name="color_glasses" type="array[string]" jt="4999545" >
+				<column name="left" type="string" jt="12" />
+				<column name="right" type="string" jt="12" />
+			</column>
+			<column name="price" type="double" jt="8" />
+			<column name="id_supplier" type="int" jt="4" />
+			<fk name="fk_glasses_supplier" virtual="y" to_schema="optica" to_table="supplier" >
+				<fk_column name="id_supplier" pk="id" />
+			</fk>
+		</table>
+		<table name="orders" prior="Collection" >
+			<column name="id_order" type="int" jt="4" mandatory="y" />
+			<column name="id_customer" type="int" jt="4" mandatory="y" />
+			<column name="worker_name" prior="id_worker" type="string" jt="12" mandatory="y" />
+			<column name="detail" type="array[int]" jt="4999545" >
+				<column name="id_glasses" type="int" jt="4" />
+				<column name="quantity" type="int" jt="4" />
+			</column>
+			<fk name="fk_orders_customers" virtual="y" to_schema="optica" to_table="customers" >
+				<fk_column name="id_customer" pk="id" />
+			</fk>
+			<fk name="fk_orders_glasses" virtual="y" to_schema="optica" to_table="glasses" >
+				<fk_column name="detail.id_glasses" pk="id" />
+			</fk>
+		</table>
+		<table name="supplier" prior="Collection" >
+			<column name="id" type="int" jt="4" mandatory="y" />
+			<column name="name" type="string" jt="12" mandatory="y" />
+			<column name="address" type="array[string]" jt="4999545" >
+				<column name="street" type="string" jt="12" />
+				<column name="street_number" type="int" jt="4" />
+				<column name="door" type="string" jt="12" />
+				<column name="city" type="string" jt="12" />
+				<column name="postal_code" type="int" jt="4" >
+					<type_options><![CDATA[minimum: 5 maximum: 5]]></type_options>
+				</column>
+				<column name="country" type="string" jt="12" />
+			</column>
+			<column name="phone" type="int" jt="4" >
+				<type_options><![CDATA[minimum: 9 maximum: 9]]></type_options>
+			</column>
+			<column name="fax" type="int" jt="4" />
+			<column name="nif" type="string" jt="12" />
+		</table>
+	</schema>
+	<connector name="MyDb" database="MySql" host="localhost" port="3306" user="root" />
+	<layout name="Default Layout" id="Layout-1b5f" show_relation="columns" >
+		<entity schema="optica" name="customers" color="C1D8EE" x="208" y="48" />
+		<entity schema="optica" name="glasses" color="C1D8EE" x="144" y="464" />
+		<entity schema="optica" name="orders" color="C1D8EE" x="368" y="304" />
+		<entity schema="optica" name="supplier" color="C1D8EE" x="48" y="224" />
+	</layout>
+</project>

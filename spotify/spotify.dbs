@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="spotify" id="Project-5de" database="MongoDb" >
+	<schema name="spotify" >
+		<table name="subscription" prior="Collection" >
+			<column name="id" type="int" jt="4" />
+			<column name="subs_start" type="date" jt="91" />
+			<column name="subs_next_date" type="date" jt="91" />
+			<index name="unq_subscription" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="user" prior="Collection" >
+			<column name="id" type="int" jt="4" mandatory="y" />
+			<column name="email" type="string" jt="12" mandatory="y" />
+			<column name="password" type="string" jt="12" mandatory="y" />
+			<column name="user_name" type="string" jt="12" mandatory="y" />
+			<column name="date_of_birth" type="date" jt="91" mandatory="y" />
+			<column name="gender" type="enum" jt="12" mandatory="y" >
+				<enumeration><![CDATA['you dont care','female','male']]></enumeration>
+			</column>
+			<column name="country" type="string" jt="12" mandatory="y" />
+			<column name="postal_code" type="int" jt="4" mandatory="y" >
+				<type_options><![CDATA[minimum: 5 maximum: 5]]></type_options>
+			</column>
+			<column name="subscriptopn_type" type="enum" jt="12" mandatory="y" >
+				<enumeration><![CDATA['free','premium']]></enumeration>
+			</column>
+			<index name="unq_user" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+	</schema>
+	<layout name="Default Layout" id="Layout-1692" show_relation="columns" >
+		<entity schema="spotify" name="subscription" color="C1D8EE" x="208" y="496" />
+		<entity schema="spotify" name="user" color="C1D8EE" x="208" y="176" />
+		<callout x="48" y="48" pointer="Round" >
+			<comment><![CDATA[Add tables to the layout by drag & drop from the project structure.
+Currently, the model is in offline mode, which means new tables will be created only in the model file.
+Drop this callout from its context menu.]]></comment>
+		</callout>
+	</layout>
+</project>

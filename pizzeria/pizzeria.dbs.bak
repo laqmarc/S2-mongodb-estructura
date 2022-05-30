@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="Pizzeria" id="Project-1ad5" database="MongoDb" >
+	<comment><![CDATA[Tingues en compte les següents indicacions per a modelar com seria la base de dades del projecte: Per a cada client emmagatzemem un identificador únic, nom, cognoms, adreça, codi postal, localitat, província i número de telèfon. Les dades de localitat i província estaran emmagatzemats en taules separades. Sabem que una localitat pertany a una única província, i que una província pot tenir moltes localitats. Per a cada localitat emmagatzemem un identificador únic i un nom. Per a cada província emmagatzemem un identificador únic i un nom.
+Un client pot realitzar moltes comandes, però una única comanda només pot ser realitzat per un únic client. De cada comanda s'emmagatzema un identificador únic, data/hora, si la comanda és per a repartiment a domicili o per a recollir en botiga, la quantitat de productes que s'han seleccionat de cada tipus i el preu total. Una comanda pot constar d'un o diversos productes.
+Els productes poden ser pizzes, hamburgueses i begudes. De cada producte s'emmagatzema: un identificador únic, nom, descripció, imatge i preu. En el cas de les pizzes existeixen diverses categories que poden anar canviant de nom al llarg de l'any. Una pizza només pot estar dins d'una categoria, però una categoria pot tenir moltes pizzes.
+De cada categoria s'emmagatzema un identificador únic i un nom. Una comanda és gestionada per una única botiga i una botiga pot gestionar moltes comandes. De cada botiga s'emmagatzema un identificador únic, adreça, codi postal, localitat i província. En una botiga poden treballar molts empleats i un empleat només pot treballar en una botiga. De cada empleat s'emmagatzema un identificador únic, nom, cognoms, nif, telèfon i si treballa com a cuiner o repartidor. Per a les comandes de repartiment a domicili interessa guardar qui és el repartidor que realitza el lliurament de la comanda i la data/hora del moment del lliurament.]]></comment>
+	<schema name="Pizzeria" >
+		<table name="category_products" prior="Collection" >
+			<column name="id" type="int" jt="4" />
+			<column name="name" type="string" jt="12" />
+			<index name="unq_category_products" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="city" prior="Collection" >
+			<column name="id" type="int" jt="4" />
+			<column name="name" type="string" jt="12" />
+			<column name="id_state" type="int" jt="4" />
+			<index name="idx_city" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_city_state" virtual="y" to_schema="Pizzeria" to_table="state" >
+				<fk_column name="id_state" pk="id" />
+			</fk>
+		</table>
+		<table name="customer" prior="Collection" >
+			<column name="id" type="int" jt="4" />
+			<column name="name" type="array[string]" jt="4999545" >
+				<column name="name" type="string" jt="12" />
+				<column name="surname1" type="string" jt="12" />
+				<column name="surname2" type="string" jt="12" />
+			</column>
+			<column name="address" prior="addres" type="array[string]" jt="4999545" >
+				<column name="street" type="string" jt="12" />
+				<column name="street_number" type="int" jt="4" />
+				<column name="postal_code" type="int" jt="4" >
+					<type_options><![CDATA[minimum: 5 maximum: 5]]></type_options>
+				</column>
+				<column name="id_city" type="int" jt="4" />
+			</column>
+			<column name="phone" type="int" jt="4" >
+				<type_options><![CDATA[minimum: 9 maximum: 9]]></type_options>
+			</column>
+			<index name="unq_customer" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_customer_city" virtual="y" to_schema="Pizzeria" to_table="city" >
+				<fk_column name="address.id_city" pk="id" />
+			</fk>
+		</table>
+		<table name="orders" prior="Collection" >
+			<column name="id" type="int" jt="4" mandatory="y" />
+			<column name="id_customer" type="int" jt="4" mandatory="y" />
+			<column name="order_date" type="date" jt="91" mandatory="y" />
+			<column name="order_type" type="enum" jt="12" mandatory="y" >
+				<enumeration><![CDATA['delivery','take away']]></enumeration>
+			</column>
+			<column name="products_quantity" type="array[int]" jt="4999545" >
+				<column name="id_product" type="int" jt="4" mandatory="y" />
+				<column name="quantity" type="int" jt="4" mandatory="y" />
+			</column>
+			<column name="total_price" type="int" jt="4" mandatory="y" />
+			<column name="id_shop" type="int" jt="4" />
+			<column name="delivery" type="array[string]" jt="4999545" >
+				<column name="id_worker" type="int" jt="4" />
+				<column name="delivered_date" type="date" jt="91" />
+			</column>
+			<index name="unq_orders" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_orders_customer" virtual="y" to_schema="Pizzeria" to_table="customer" >
+				<fk_column name="id_customer" pk="id" />
+			</fk>
+			<fk name="fk_orders_products" virtual="y" to_schema="Pizzeria" to_table="products" >
+				<fk_column name="products_quantity.id_product" pk="id" />
+			</fk>
+			<fk name="fk_orders_shop" virtual="y" to_schema="Pizzeria" to_table="shop" >
+				<fk_column name="id_shop" pk="id" />
+			</fk>
+			<fk name="fk_orders_worker" virtual="y" to_schema="Pizzeria" to_table="worker" >
+				<fk_column name="delivery.id_worker" pk="id" />
+			</fk>
+		</table>
+		<table name="products" prior="Collection" >
+			<column name="id" type="int" jt="4" mandatory="y" />
+			<column name="name" type="string" jt="12" mandatory="y" />
+			<column name="description" type="string" jt="12" />
+			<column name="img_src" type="string" jt="12" />
+			<column name="price" type="double" jt="8" mandatory="y" />
+			<column name="id_category" type="int" jt="4" />
+			<index name="unq_products" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_products_category_products" virtual="y" to_schema="Pizzeria" to_table="category_products" >
+				<fk_column name="id_category" pk="id" />
+			</fk>
+		</table>
+		<table name="shop" prior="Collection" >
+			<column name="id" type="int" jt="4" />
+			<column name="street" type="string" jt="12" />
+			<column name="id_city" type="int" jt="4" />
+			<index name="unq_shop" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+			<fk name="fk_shop_city" virtual="y" to_schema="Pizzeria" to_table="city" >
+				<fk_column name="id_city" pk="id" />
+			</fk>
+		</table>
+		<table name="state" prior="Collection" >
+			<column name="id" type="int" jt="4" />
+			<column name="name" type="string" jt="12" />
+			<index name="unq_state" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+		<table name="worker" prior="Collection" >
+			<column name="id" type="int" jt="4" />
+			<column name="name" type="array[string]" jt="4999545" >
+				<column name="name" type="string" jt="12" />
+				<column name="surname1" type="string" jt="12" />
+				<column name="surname2" type="string" jt="12" />
+			</column>
+			<column name="phone" type="int" jt="4" />
+			<column name="role" type="enum" jt="12" >
+				<enumeration><![CDATA['cooker','delivery']]></enumeration>
+			</column>
+			<index name="unq_worker" unique="UNIQUE_KEY" >
+				<column name="id" />
+			</index>
+		</table>
+	</schema>
+	<connector name="MongoDb" database="MongoDb" host="localhost" port="27017" user="admin" />
+	<layout name="Default Layout" id="Layout-1df2" show_relation="columns" >
+		<entity schema="Pizzeria" name="category_products" color="C1D8EE" x="560" y="144" />
+		<entity schema="Pizzeria" name="city" color="C1D8EE" x="160" y="64" />
+		<entity schema="Pizzeria" name="customer" color="C1D8EE" x="160" y="288" />
+		<entity schema="Pizzeria" name="orders" color="C1D8EE" x="336" y="288" />
+		<entity schema="Pizzeria" name="products" color="C1D8EE" x="560" y="288" />
+		<entity schema="Pizzeria" name="shop" color="C1D8EE" x="320" y="48" />
+		<entity schema="Pizzeria" name="state" color="C1D8EE" x="48" y="144" />
+		<entity schema="Pizzeria" name="worker" color="C1D8EE" x="464" y="48" />
+	</layout>
+</project>
