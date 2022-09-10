@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="MongoDb" id="Project-1ff2" database="MongoDb" >
+	<schema name="pizzabona" >
+		<table name="Comanda" >
+			<column name="_id" type="objectId" jt="-8" mandatory="y" />
+			<column name="id_comanda_general" type="objectId" jt="-8" mandatory="y" />
+			<column name="data_comanda" type="timestamp" jt="93" mandatory="y" />
+			<column name="tipus_comanda" type="enum" jt="12" mandatory="y" >
+				<enumeration><![CDATA['domicili','recollida']]></enumeration>
+			</column>
+			<column name="preu_total" type="double" jt="8" mandatory="y" />
+			<column name="restaurant" type="string" jt="12" mandatory="y" />
+			<column name="treballador" type="string" jt="12" mandatory="y" />
+			<column name="tipus_treballador" type="enum" jt="12" mandatory="y" >
+				<enumeration><![CDATA['cuiner','repartidor']]></enumeration>
+			</column>
+			<column name="nom_client" type="string" jt="12" mandatory="y" />
+			<column name="cognom_client" type="string" jt="12" />
+			<column name="telefon" type="int" jt="4" />
+			<column name="adreça" type="string" jt="12" />
+			<column name="localitat" type="string" jt="12" />
+			<column name="provincia" type="string" jt="12" />
+			<column name="codi_postal" type="int" jt="4" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="fk_comanda_comanda_producte" virtual="y" to_schema="pizzabona" to_table="Comanda_producte" >
+				<fk_column name="id_comanda_general" pk="id_comanda" />
+			</fk>
+		</table>
+		<table name="Comanda_producte" >
+			<column name="_id" type="objectId" jt="-8" mandatory="y" />
+			<column name="id_comanda" type="objectId" jt="-8" mandatory="y" />
+			<column name="id_producte" type="objectId" jt="-8" mandatory="y" />
+			<column name="cantitat_producte" type="int" jt="4" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+		</table>
+		<table name="Productes" >
+			<column name="_id" type="objectId" jt="-8" mandatory="y" />
+			<column name="id_producte_general" prior="id_producte" type="objectId" jt="-8" mandatory="y" />
+			<column name="nom_producte" type="string" jt="12" mandatory="y" />
+			<column name="descripccio_producte" type="string" jt="12" />
+			<column name="imatge_producte" type="string" jt="12" />
+			<column name="tipus_producte" type="enum" jt="12" mandatory="y" >
+				<enumeration><![CDATA['beguda','pizza','hamburgesa']]></enumeration>
+			</column>
+			<column name="preu_producte" type="double" jt="8" mandatory="y" />
+			<index name="_id_" unique="PRIMARY_KEY" >
+				<column name="_id" />
+			</index>
+			<fk name="fk_productes_comanda_producte" virtual="y" to_schema="pizzabona" to_table="Comanda_producte" >
+				<fk_column name="id_producte_general" pk="id_producte" />
+			</fk>
+		</table>
+	</schema>
+	<connector name="MongoDb" database="MongoDb" driver_class="com.wisecoders.dbschema.mongodb.JdbcDriver" driver_jar="mongojdbc4.8.jar" driver_desc="No Authentication" host="localhost" port="27017" instance="pizzabona" user="admin" />
+	<layout name="Main Layout" id="Layout-c7a" show_relation="columns" >
+		<entity schema="pizzabona" name="Comanda" color="C1D8EE" x="48" y="48" />
+		<entity schema="pizzabona" name="Comanda_producte" color="C1D8EE" x="448" y="160" />
+		<entity schema="pizzabona" name="Productes" color="C1D8EE" x="800" y="112" />
+		<script name="Sample" id="Editor-1f24" language="SQL" >
+			<string><![CDATA[db.sampleCollection.insert({"SampleKey":"SampleValue"});]]></string>
+		</script>
+	</layout>
+</project>

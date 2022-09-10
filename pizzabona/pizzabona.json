@@ -1,0 +1,134 @@
+CREATE DATABASE 'pizzabona'
+
+use('pizzabona');
+db.createCollection('Comanda', {
+    validator: {
+        $jsonSchema: {
+            "bsonType": "object",
+            "required": [
+                "id_comanda_general",
+                "data_comanda",
+                "tipus_comanda",
+                "preu_total",
+                "restaurant",
+                "treballador",
+                "tipus_treballador",
+                "nom_client"
+            ],
+            "properties": {
+                "treballador": {
+                    "bsonType": "string"
+                },
+                "nom_client": {
+                    "bsonType": "string"
+                },
+                "tipus_treballador": {
+                    "enum": [
+                        "cuiner",
+                        "repartidor"
+                    ]
+                },
+                "data_comanda": {
+                    "bsonType": "timestamp"
+                },
+                "restaurant": {
+                    "bsonType": "string"
+                },
+                "preu_total": {
+                    "bsonType": "double"
+                },
+                "cognom_client": {
+                    "bsonType": "string"
+                },
+                "id_comanda_general": {
+                    "bsonType": "int"
+                },
+                "adreça": {
+                    "bsonType": "string"
+                },
+                "provincia": {
+                    "bsonType": "string"
+                },
+                "tipus_comanda": {
+                    "enum": [
+                        "domicili",
+                        "recollida"
+                    ]
+                },
+                "telefon": {
+                    "bsonType": "int"
+                },
+                "codi_postal": {
+                    "bsonType": "int"
+                },
+                "localitat": {
+                    "bsonType": "string"
+                }
+            }
+        }
+    }
+});
+
+use('pizzabona');
+db.createCollection('Comanda_producte', {
+    validator: {
+        $jsonSchema: {
+            "bsonType": "object",
+            "required": [
+                "id_comanda",
+                "id_producte",
+                "cantitat_producte"
+            ],
+            "properties": {
+                "id_producte": {
+                    "bsonType": "int"
+                },
+                "cantitat_producte": {
+                    "bsonType": "int"
+                },
+                "id_comanda": {
+                    "bsonType": "int"
+                }
+            }
+        }
+    }
+});
+
+use('pizzabona');
+db.createCollection('Productes', {
+    validator: {
+        $jsonSchema: {
+            "bsonType": "object",
+            "required": [
+                "id_producte_general",
+                "nom_producte",
+                "tipus_producte",
+                "preu_producte"
+            ],
+            "properties": {
+                "imatge_producte": {
+                    "bsonType": "string"
+                },
+                "tipus_producte": {
+                    "enum": [
+                        "beguda",
+                        "pizza",
+                        "hamburgesa"
+                    ]
+                },
+                "preu_producte": {
+                    "bsonType": "double"
+                },
+                "id_producte_general": {
+                    "bsonType": "int"
+                },
+                "nom_producte": {
+                    "bsonType": "string"
+                },
+                "descripccio_producte": {
+                    "bsonType": "string"
+                }
+            }
+        }
+    }
+});
